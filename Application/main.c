@@ -68,7 +68,11 @@
 #ifdef ELEMENT_CHARACTERIZATION_MODE
 // Delta Counts returned from the API function for the sensor during characterization
 unsigned int dCnt;
+unsigned int buttonCnt[5];               // Becuase the Wheel is composed of five elements
 #endif
+
+struct Element * keyPressed;            // Pointer to the Element structure
+
 
 unsigned char tempflag;
 
@@ -98,8 +102,8 @@ void main(void)
   CSCTL2 = SELA__VLOCLK + SELS_3 + SELM_3;  // set SMCLK = MCLK = DCO  LFXT1 = VLO
   CSCTL0_H = 0;                             // Lock CS registers
   // Initialize better
-  P4DIR |= BIT3 + BIT4;
-  P1DIR |= BIT1 + BIT0;
+  P1DIR |= BIT1 + BIT0 + BIT2 + BIT3;
+  P1OUT = 0;
 
   PM5CTL0 &= ~LOCKLPM5;
 
@@ -115,18 +119,11 @@ void main(void)
 
 
   // Initialize Baseline measurement
-  TI_CAPT_Init_Baseline(&button_two);
-  TI_CAPT_Init_Baseline(&button_one);
-  TI_CAPT_Init_Baseline(&slider_one);
-  TI_CAPT_Init_Baseline(&slider_three);
-  TI_CAPT_Init_Baseline(&slider_five);
+  TI_CAPT_Init_Baseline(&buttons);
+
 
   // Update baseline measurement (Average 5 measurements)
-  TI_CAPT_Update_Baseline(&button_two,5);
-  TI_CAPT_Update_Baseline(&button_one,5);
-//  TI_CAPT_Update_Baseline(&slider_one,5);
-//  TI_CAPT_Update_Baseline(&slider_three,5);
-//  TI_CAPT_Update_Baseline(&slider_five,5);
+  TI_CAPT_Update_Baseline(&buttons,5);
 
   
   // Main loop starts here
@@ -135,45 +132,84 @@ void main(void)
   	
   	#ifdef ELEMENT_CHARACTERIZATION_MODE
 	// Get the raw delta counts for element characterization 
-	TI_CAPT_Custom(&button_one,&dCnt);
-    TI_CAPT_Custom(&button_two,&dCnt);
-    TI_CAPT_Custom(&slider_one,&dCnt);
-    TI_CAPT_Custom(&slider_three,&dCnt);
-    TI_CAPT_Custom(&slider_five,&dCnt);
+	TI_CAPT_Custom(&buttons,buttonCnt);
 	__no_operation(); 					// Set breakpoint here	
 	#endif
 	  	
 	#ifndef ELEMENT_CHARACTERIZATION_MODE	  	
-	// Check if the middle element sensor has been triggered. The API call
-	// compares the value from the sensor against the threshold to determine
-	// trigger condition
+    // Return the pointer to the element which has been touched
+    keyPressed = (struct Element *)TI_CAPT_Buttons(&buttons);
 
-	if(TI_CAPT_Button(&button_one)) {
-		// Do something
-		//P4OUT |= BIT3;                            // Turn on center LED
-		//P4OUT &= ~BIT2;
-		P1OUT |= BIT1;
-	}
-	else {
-		//P4OUT &= ~BIT3;                           // Turn off center LED
-		//P4OUT |= BIT2;
-		P1OUT &= ~BIT1;
-    }
+    if(keyPressed){
+        if(keyPressed == &left_button){
+            P1OUT |= BIT0;
+        }
+        if(keyPressed == &right_button) {
+            P1OUT |= BIT1;
+        }
 
-	if(TI_CAPT_Button(&button_two)) {
-        //P4OUT |= BIT4;                            // Turn on center LED
-        P1OUT |= BIT0;
+        if(keyPressed == &left_slider) {
+            if (slider_last == 4) { // LeftLED
+                P1OUT |= BIT2;
+                P1OUT &= ~BIT3;
+            }
+            slider_last = 1;
+        }
+        if(keyPressed == &middle_slider) {
+            if (slider_last == 1 || slider_last == 2) {
+                slider_last = 2;
+            }
+            else if (slider_last == 5 || slider_last == 4) {
+                slider_last = 4;
+            }
+            else {
+                slider_last = 3;
+            }
+        }
+        if(keyPressed == &right_slider) {
+            if (slider_last == 2) { // Right LED
+                P1OUT |= BIT3;
+                P1OUT &= ~BIT2;
+            }
+            slider_last = 5;
+        }
+
     }
-    else {
-        //P4OUT &= ~BIT4;                           // Turn off center LED
+    else{
+        P1OUT &= ~BIT1;
         P1OUT &= ~BIT0;
     }
-    // Put the MSP430 into LPM3 for a certain DELAY period
+
+
+
+//	if(TI_CAPT_Button(&button_one)) {
+//		// Do something
+//		//P4OUT |= BIT3;                            // Turn on center LED
+//		//P4OUT &= ~BIT2;
+// 		P1OUT |= BIT0;
+//	}
+//	else {
+//		//P4OUT &= ~BIT3;                           // Turn off center LED
+//		//P4OUT |= BIT2;
+//		P1OUT &= ~BIT0;
+//    }
+//
+//	if(TI_CAPT_Button(&button_two)) {
+//        //P4OUT |= BIT4;                            // Turn on center LED
+//        P1OUT |= BIT1;
+//    }
+//    else {
+//        //P4OUT &= ~BIT4;                           // Turn off center LED
+//        P1OUT &= ~BIT1;
+//    }
+//    // Put the MSP430 into LPM3 for a certain DELAY period
+//
+//    TI_CAPT_Button(&slider_five);
+
     sleep(DELAY);
     #endif
 
 
-    //TI_CAPT_Button(&slider_one);
 
 //  switch(slider_last){
 //      case 1:

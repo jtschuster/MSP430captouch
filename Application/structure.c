@@ -82,10 +82,10 @@ const struct Element right_button = // P4.2
     .threshold = 1000
 };
 
-const struct Element left_slider = //P6.0
+const struct Element left_slider = //P4.3
 {
     //.inputBits = CAPSIOPOSEL0 +CAPSIOPISEL2,// + CAPSIOPISEL0,   // select 1.5
-     .inputBits = CAPSIOPOSEL2 + CAPSIOPOSEL1,
+     .inputBits = CAPSIOPOSEL2 + CAPSIOPISEL1 + CAPSIOPISEL0,
     /* When using an abstracted function to measure the element
      * the 100*(maxResponse - threshold) < 0xFFFF
      * ie maxResponse - threshold < 655
@@ -99,10 +99,10 @@ const struct Element left_slider = //P6.0
     .threshold = 1000
 };
 
-const struct Element middle_slider = //P6.1
+const struct Element middle_slider = //P4.4
 {
     //.inputBits = CAPSIOPOSEL0 +CAPSIOPISEL2,// + CAPSIOPISEL0,   // select 1.5
-     .inputBits = CAPSIOPOSEL2 + CAPSIOPOSEL1 + CAPSIOPISEL0,
+     .inputBits = CAPSIOPOSEL2 + CAPSIOPISEL2,
     /* When using an abstracted function to measure the element
      * the 100*(maxResponse - threshold) < 0xFFFF
      * ie maxResponse - threshold < 655
@@ -116,10 +116,10 @@ const struct Element middle_slider = //P6.1
     .threshold = 1000
 };
 
-const struct Element right_slider = //P6.2
+const struct Element right_slider = //P4.7
 {
     //.inputBits = CAPSIOPOSEL0 +CAPSIOPISEL2,// + CAPSIOPISEL0,
-     .inputBits = CAPSIOPOSEL2 + CAPSIOPOSEL1 + CAPSIOPISEL1,
+     .inputBits = CAPSIOPOSEL2 + CAPSIOPISEL2 + CAPSIOPISEL1 + CAPSIOPISEL0,
     /* When using an abstracted function to measure the element
      * the 100*(maxResponse - threshold) < 0xFFFF
      * ie maxResponse - threshold < 655
@@ -133,109 +133,126 @@ const struct Element right_slider = //P6.2
     .threshold = 1000
 };
 
-
-
-// One Button Sensor
-const struct Sensor button_one =
-{ 
-    /****** For RO_CSIO_TA2_WDTA **************/
-    .halDefinition = RO_CSIO_TA2_WDTA,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,						
-    .baseOffset = 0,						
-    // Pointer to elements
-    .arrayPtr[0] = &left_button,  		// point to middle element
-    // Timer Information
-    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
-    .accumulationCycles= WDTA_GATE_64
-
-
-    /****** For RO_CSIO_TA2_TA3 **************/
-    /*.halDefinition = RO_CSIO_TA2_TA3,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,
-    .baseOffset = 0,
-    // Pointer to elements
-    .arrayPtr[0] = &middle_element,  		// point to middle element
-    // Timer Information, which determine the Gate Time
-    .measGateSource= TIMER_ACLK,     // Clock Source for the Gate Timer A3
-    .sourceScale = TIMER_SOURCE_DIV_3,
-    .accumulationCycles= 10        //CCRx for Timer A3*/
-
-    /****** For fRO_CSIO_TA2_TA3 **************/
-    /*.halDefinition = fRO_CSIO_TA2_TA3,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL, 
-    .numElements = 1,						
-    .baseOffset = 0,						
-    // Pointer to elements
-    .arrayPtr[0] = &middle_element,  		// point to middle element
-    // Timer Information, which determine the Gate Time
-    .measGateSource= TIMER_SMCLK,     // Clock source for Timer A3
-    .sourceScale = TIMER_SOURCE_DIV_0,
-    .accumulationCycles= 10000       
-    // accumulationCycles represets CCRx for Gate Timer A2, 
-    // the clock source is by OSC*/
-
-};
-
-const struct Sensor button_two =
+const struct Sensor buttons =
 {
     /****** For RO_CSIO_TA2_WDTA **************/
     .halDefinition = RO_CSIO_TA2_WDTA,
     .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,
+    .numElements = 5,
     .baseOffset = 0,
     // Pointer to elements
-    .arrayPtr[0] = &right_button,        // point to middle element
+    .arrayPtr[0] = &left_button,         // point to up element
+    .arrayPtr[1] = &right_button,       // point to down element
+    .arrayPtr[2] = &left_slider,       // point to left element
+    .arrayPtr[3] = &middle_slider,          // point to right element
+    .arrayPtr[4] = &right_slider,         // point to middle element
     // Timer Information
-    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
-    .accumulationCycles= WDTA_GATE_64
+    .measGateSource= GATE_WDTA_VLO,
+    .accumulationCycles= WDTA_GATE_64           // 64 VLO cycles
 };
 
-
-
-const struct Sensor slider_one =
-{
-    /****** For RO_CSIO_TA2_WDTA **************/
-    .halDefinition = RO_CSIO_TA2_WDTA,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,
-    .baseOffset = 0,
-    // Pointer to elements
-    .arrayPtr[0] = &left_slider,        // point to middle element
-    // Timer Information
-    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
-    .accumulationCycles= WDTA_GATE_64
-};
-
-
-
-const struct Sensor slider_three =
-{
-    /****** For RO_CSIO_TA2_WDTA **************/
-    .halDefinition = RO_CSIO_TA2_WDTA,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,
-    .baseOffset = 0,
-    // Pointer to elements
-    .arrayPtr[0] = &middle_slider,        // point to middle element
-    // Timer Information
-    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
-    .accumulationCycles= WDTA_GATE_64
-};
-
-
-
-const struct Sensor slider_five =
-{
-    /****** For RO_CSIO_TA2_WDTA **************/
-    .halDefinition = RO_CSIO_TA2_WDTA,
-    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
-    .numElements = 1,
-    .baseOffset = 0,
-    // Pointer to elements
-    .arrayPtr[0] = &right_slider,        // point to middle element
-    // Timer Information
-    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
-    .accumulationCycles= WDTA_GATE_64
-};
+//
+//// One Button Sensor
+//const struct Sensor button_one =
+//{
+//    /****** For RO_CSIO_TA2_WDTA **************/
+//    .halDefinition = RO_CSIO_TA2_WDTA,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &left_button,  		// point to middle element
+//    // Timer Information
+//    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
+//    .accumulationCycles= WDTA_GATE_64
+//
+//
+//    /****** For RO_CSIO_TA2_TA3 **************/
+//    /*.halDefinition = RO_CSIO_TA2_TA3,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &middle_element,  		// point to middle element
+//    // Timer Information, which determine the Gate Time
+//    .measGateSource= TIMER_ACLK,     // Clock Source for the Gate Timer A3
+//    .sourceScale = TIMER_SOURCE_DIV_3,
+//    .accumulationCycles= 10        //CCRx for Timer A3*/
+//
+//    /****** For fRO_CSIO_TA2_TA3 **************/
+//    /*.halDefinition = fRO_CSIO_TA2_TA3,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &middle_element,  		// point to middle element
+//    // Timer Information, which determine the Gate Time
+//    .measGateSource= TIMER_SMCLK,     // Clock source for Timer A3
+//    .sourceScale = TIMER_SOURCE_DIV_0,
+//    .accumulationCycles= 10000
+//    // accumulationCycles represets CCRx for Gate Timer A2,
+//    // the clock source is by OSC*/
+//
+//};
+//
+//const struct Sensor button_two =
+//{
+//    /****** For RO_CSIO_TA2_WDTA **************/
+//    .halDefinition = RO_CSIO_TA2_WDTA,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &right_button,        // point to middle element
+//    // Timer Information
+//    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
+//    .accumulationCycles= WDTA_GATE_64
+//};
+//
+//
+//
+//const struct Sensor slider_one =
+//{
+//    /****** For RO_CSIO_TA2_WDTA **************/
+//    .halDefinition = RO_CSIO_TA2_WDTA,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &left_slider,        // point to middle element
+//    // Timer Information
+//    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
+//    .accumulationCycles= WDTA_GATE_64
+//};
+//
+//
+//
+//const struct Sensor slider_three =
+//{
+//    /****** For RO_CSIO_TA2_WDTA **************/
+//    .halDefinition = RO_CSIO_TA2_WDTA,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &middle_slider,        // point to middle element
+//    // Timer Information
+//    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
+//    .accumulationCycles= WDTA_GATE_64
+//};
+//
+//
+//
+//const struct Sensor slider_five =
+//{
+//    /****** For RO_CSIO_TA2_WDTA **************/
+//    .halDefinition = RO_CSIO_TA2_WDTA,
+//    .inputCapsioctlRegister = (uint16_t *)&CAPSIO0CTL,
+//    .numElements = 1,
+//    .baseOffset = 0,
+//    // Pointer to elements
+//    .arrayPtr[0] = &right_slider,        // point to middle element
+//    // Timer Information
+//    .measGateSource= GATE_WDTA_VLO,     //  Gate Clock Source
+//    .accumulationCycles= WDTA_GATE_64
+//};

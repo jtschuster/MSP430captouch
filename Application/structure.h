@@ -60,11 +60,13 @@ extern const struct Element middle_slider;
 extern const struct Element left_slider;
 
 // One Button Sensor
-extern const struct Sensor button_two;
-extern const struct Sensor button_one;
-extern const struct Sensor slider_one;
-extern const struct Sensor slider_three;
-extern const struct Sensor slider_five;
+extern const struct Sensor buttons;
+
+//extern const struct Sensor button_two;
+//extern const struct Sensor button_one;
+//extern const struct Sensor slider_one;
+//extern const struct Sensor slider_three;
+//extern const struct Sensor slider_five;
 
 
 
@@ -74,7 +76,7 @@ extern const struct Sensor slider_five;
 // they are going to be segmented into seperate groups.  This defines the 
 // RAM allocation for the baseline tracking.  If only the TI_CAPT_Raw function
 // is used, then this definition should be removed to conserve RAM space.
-#define TOTAL_NUMBER_OF_ELEMENTS 1
+#define TOTAL_NUMBER_OF_ELEMENTS 5
 // If the RAM_FOR_FLASH definition is removed, then the appropriate HEAP size 
 // must be allocated. 2 bytes * MAXIMUM_NUMBER_OF_ELEMENTS_PER_SENSOR + 2 bytes
 // of overhead.
@@ -83,7 +85,7 @@ extern const struct Sensor slider_five;
 // This defines the array size in the sensor strucure.  In the event that 
 // RAM_FOR_FLASH is defined, then this also defines the amount of RAM space
 // allocated (global variable) for computations.
-#define MAXIMUM_NUMBER_OF_ELEMENTS_PER_SENSOR  1
+#define MAXIMUM_NUMBER_OF_ELEMENTS_PER_SENSOR  5
 //****** Choosing a  Measurement Method ****************************************
 // These variables are references to the definitions found in structure.c and
 // must be generated per the application.
